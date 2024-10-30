@@ -2,7 +2,7 @@ class Wordle {
   constructor() {
     this.filaActual = 0;
     this.columnaActual = 0;
-
+    this.palabraAAdivinar = "ramon";
     this.init();
   }
 
@@ -39,9 +39,67 @@ class Wordle {
       for (let j = 0; j < letras[i].length; j++) {
         const boton = document.createElement("button");
         boton.innerHTML = letras[i][j];
+        boton.addEventListener("click", (e) => this.write(e));
         fila.appendChild(boton);
       }
       teclado.appendChild(fila);
+    }
+  }
+
+  write(e) {
+    const key = e.target.innerHTML;
+    const filas = document.getElementsByClassName("fila");
+    const cajitasActual = filas[this.filaActual].getElementsByClassName("caja");
+
+    if (key === "Del") {
+      this.del(cajitasActual);
+    } else if (key === "Enter") {
+      // Verificar la palabra. Ver letras de acuerdo a palabra del diccioanario
+      this.verificarPalabra(cajitasActual);
+      // Ir a siguiente linea
+      this.irSiguienteLinea();
+    } else if (this.columnaActual < 5) {
+      this.agregarLetra(cajitasActual, key);
+    }
+    console.log(key);
+  }
+
+  del(cajitasActual) {
+    if (this.columnaActual > 0) {
+      this.columnaActual--;
+      cajitasActual[this.columnaActual].innerHTML = "";
+    }
+  }
+
+  irSiguienteLinea() {
+    if (this.columnaActual === 5) {
+      this.filaActual++;
+      this.columnaActual = 0;
+    }
+  }
+
+  agregarLetra(cajitasActual, letra) {
+    cajitasActual[this.columnaActual].innerHTML = letra;
+    this.columnaActual++;
+  }
+
+  verificarPalabra(cajitasActual) {
+    const palabra = Array.from(cajitasActual).map((caja) =>
+      caja.innerHTML.toLowerCase()
+    );
+
+    for (let i = 0; i < 5; i++) {
+      const letra = palabra[i];
+      if (letra === this.palabraAAdivinar[i]) {
+        //VERDE
+        cajitasActual[i].style.backgroundColor = "green";
+      } else if (this.palabraAAdivinar.includes(letra)) {
+        // AMARILLO
+        cajitasActual[i].style.backgroundColor = "yellow";
+      } else {
+        // ROJO
+        cajitasActual[i].style.backgroundColor = "red";
+      }
     }
   }
 }
